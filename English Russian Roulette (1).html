@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>English Russian Roulette</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Work+Sans:wght@400;600&display=swap">
+<style>
+:root{--bg:#E4EEE7;--ink:#10291F;--card:#F7FBF8;--line:#B7CCBE;--red:#B3162B;--brass:#8A6410;--soft:#4B6356;--on-red:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0D3024;--ink:#F1EFE4;--card:#13402F;--line:#2C5E49;--red:#E5384F;--brass:#E3B450;--soft:#A9C7B8}}
+:root[data-theme="dark"]{--bg:#0D3024;--ink:#F1EFE4;--card:#13402F;--line:#2C5E49;--red:#E5384F;--brass:#E3B450;--soft:#A9C7B8}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 "Work Sans",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font:400 clamp(34px,8vw,64px)/1 "Alfa Slab One",Georgia,serif;margin:8px 0 6px;color:var(--red)}
+h2{font:400 26px/1.1 "Alfa Slab One",Georgia,serif;margin:0 0 4px}
+.sub{color:var(--soft);margin:0 0 20px}
+.stage{background:var(--card);border:2px solid var(--ink);border-radius:20px;padding:20px;margin-bottom:34px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
+.chip{font:600 14px "Work Sans",sans-serif;border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:99px;padding:6px 12px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+button:focus-visible{outline:3px solid var(--brass);outline-offset:2px}
+.cat{color:var(--brass);font-weight:600;min-height:1.5em}
+.prompt{font:400 clamp(26px,6vw,42px)/1.2 "Alfa Slab One",Georgia,serif;min-height:3.6em;margin:6px 0 14px}
+.exp{background:var(--bg);border-left:5px solid var(--brass);border-radius:6px;padding:8px 14px;margin:0 0 14px;font-size:16px}
+.exp:empty{display:none}
+.phase{font:400 22px/1.2 "Alfa Slab One",Georgia,serif;border-radius:12px;padding:10px 16px;margin:6px 0 12px;text-align:center}
+.phase:empty{display:none}
+.phase.think{background:var(--brass);color:var(--bg)}
+.phase.talk{background:var(--red);color:#fff}
+.bar{height:14px;border-radius:9px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:100%;background:var(--brass);transform-origin:left}
+.bar.low i{background:var(--red)}
+.time{font:400 28px "Alfa Slab One",serif;margin:8px 0 0;min-height:1.2em}
+.btns{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.btn{font:600 17px "Work Sans",sans-serif;border:2px solid var(--ink);border-radius:12px;padding:12px 18px;background:var(--card);color:var(--ink);cursor:pointer}
+.btn.go{background:var(--red);border-color:var(--red);color:var(--on-red)}
+.btn[disabled]{opacity:.4;cursor:default}
+.ans{margin-top:12px;font-weight:600;color:var(--brass);min-height:1.5em}
+.deck{margin-bottom:34px}
+ul{list-style:none;padding:0;margin:12px 0 0;display:grid;gap:8px}
+li{background:var(--card);border-left:5px solid var(--brass);border-radius:6px;padding:10px 14px}
+li small{display:block;color:var(--soft)}
+.tr li{display:flex;justify-content:space-between;gap:12px}
+.tr li span:last-child{color:var(--soft);text-align:right}
+.forf li{border-left-color:var(--red)}
+.rules{background:var(--card);border:1.5px dashed var(--line);border-radius:12px;padding:6px 18px;margin-bottom:28px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<h1>English Russian Roulette</h1>
+<p class="sub">Nivel B1–B2 · Un estudiante a la vez · 5–7 segundos para responder</p>
+
+<div class="rules">
+<p><b>Reglas:</b> el profesor lanza un reto y el estudiante responde sin titubear. Si se queda en blanco, tartamudea demasiado o responde mal, “muere” y cumple un castigo. Con <b>2 vidas</b> por estudiante, el segundo error trae castigo doble. En <b>Grammar</b> hay 10 s para pensar y 10 s para hablar, con una mini explicación del tema.</p>
+</div>
+
+<section class="stage" aria-live="polite">
+<div class="chips" id="chips" role="group" aria-label="Categoría"></div>
+<div class="chips" id="flu-opt" role="group" aria-label="Tiempo en Fluency"><span style="align-self:center;color:var(--soft)">Tiempo en Fluency:</span><button class="chip" data-s="60" aria-pressed="true">1:00</button><button class="chip" data-s="90" aria-pressed="false">1:30</button></div>
+<div class="cat" id="cat">Elige una categoría y pulsa Spin.</div>
+<div class="phase" id="phase" role="status"></div>
+<div class="prompt" id="prompt">Ready?</div>
+<div class="exp" id="exp"></div>
+<div class="bar" id="bar"><i id="fill"></i></div>
+<div class="time" id="time"></div>
+<div class="ans" id="ans"></div>
+<div class="btns">
+<button class="btn go" id="spin">Spin</button>
+<button class="btn" id="reveal" disabled>Mostrar respuesta</button>
+<button class="btn" id="dead">☠ Forfeit</button>
+</div>
+</section>
+
+<section class="deck"><h2>1. Extreme Vocabulary</h2><ul id="L-voc"></ul></section>
+<section class="deck"><h2>2. Mental Agility &amp; Fluency</h2><ul id="L-flu"></ul></section>
+<section class="deck"><h2>3. Quick Grammar</h2><p class="sub">10 segundos para pensar + 10 segundos para hablar, con mini explicación del tema.</p><ul id="L-gra"></ul></section>
+<section class="deck"><h2>4. English → Español</h2><p class="sub">El profesor dice la palabra en inglés; el estudiante da el significado en español. Bonus: que la use en una frase en inglés.</p><ul class="tr" id="L-tra"></ul></section>
+<section class="deck"><h2>5. Forfeits</h2><ul class="forf" id="L-for"></ul></section>
+</main>
+
+<script>
+var D={
+voc:["Name <b>3 phrasal verbs</b> with <b>LOOK</b>.","Say <b>3 synonyms</b> for <b>“angry”</b>.","Give me <b>3 adjectives</b> to describe a <b>terrible</b> restaurant.","Name <b>3 phrasal verbs</b> with <b>GET</b>.","Say <b>3 things</b> you can <b>“make”</b> (not “do”).","Give me the <b>opposite</b> of: <b>generous, ancient, reliable</b>.","Name <b>4 jobs</b> that start with <b>T</b> or <b>S</b>.","Say <b>3 words</b> to describe <b>bad weather</b>.","Name <b>3 phrasal verbs</b> with <b>TAKE</b>.","Say <b>3 synonyms</b> for <b>“tired”</b>."],
+flu:["Give me a <b>believable excuse</b> for being late, <b>without</b> saying <b>“traffic”</b> or <b>“alarm”</b>.","Describe your <b>bedroom</b> in <b>3 sentences</b>. Go!","Tell me <b>3 things</b> you would <b>never</b> do on a first date.","Convince me to <b>buy this pen</b> in 10 seconds!","Give me <b>2 reasons</b> why cats are better than dogs (or the opposite).","Tell me what you did <b>last weekend</b> using <b>3 different past verbs</b>.","Name <b>3 things</b> in a <b>hospital</b> <b>without</b> saying “doctor” or “nurse”.","Give <b>advice</b> to someone who can’t sleep. Use <b>“should”</b> twice.","Explain what a <b>microwave</b> is <b>without</b> saying “hot” or “food”.","Tell me your <b>worst habit</b> and <b>why</b> you can’t stop."],
+gra:[
+{t:"2nd conditional",e:"If + past simple, would + verbo base. Sirve para situaciones imaginarias. Ej: If I had money, I would travel.",p:"Complete: “If I found a million dollars in the trash, I…”"},
+{t:"1st conditional",e:"If + present simple, will + verbo base. Sirve para posibilidades reales en el futuro. Ej: If it rains, I will stay home.",p:"Complete: “If it rains tomorrow, we…”"},
+{t:"Used to",e:"used to + verbo base. Sirve para hábitos o estados del pasado que ya no existen. Ej: I used to play football.",p:"Make a sentence with <b>“used to”</b> about your childhood."},
+{t:"Present perfect",e:"have / has + participio (V3). Une el pasado con el presente. Con since (desde un punto) y for (durante un periodo). Ej: She has lived here for 5 years.",p:"Correct tense: “I <b>(live)</b> here since 2019.” Say the full sentence."},
+{t:"Passive voice",e:"be (en el tiempo correcto) + participio (V3). Importa la acción, no quién la hizo; by + agente. Ej: The window was broken by a ball.",p:"Passive voice: “Romeo and Juliet… by Shakespeare.” Say the full sentence."},
+{t:"Comparatives",e:"Adjetivo corto: -er + than (taller than). Adjetivo largo: more + adjetivo + than (more expensive than).",p:"Comparative: “Living in a city is… than living in a village.”"},
+{t:"3rd conditional",e:"If + past perfect, would have + V3. Sirve para situaciones imaginarias en el pasado. Ej: If I had left earlier, I would have caught the bus.",p:"Complete: “If I had studied harder, I…”"},
+{t:"Negatives",e:"En inglés solo hay una negación por oración (no “double negative”). Con he/she/it: doesn’t + verbo base. Ej: She doesn’t like any vegetables.",p:"Fix it: “She <b>don’t</b> like <b>never</b> vegetables.”"},
+{t:"Wish",e:"wish + past simple. Sirve para deseos sobre el presente. Ej: I wish I had a car (pero no lo tengo).",p:"Wish: “I wish I <b>(have)</b> more free time.” Say the full sentence."},
+{t:"Since / For",e:"since + punto en el tiempo (since 2019, since Monday). for + duración (for three years, for two hours). Se usan con present perfect.",p:"One sentence with <b>“since”</b> and one with <b>“for”</b>."}
+],
+tra:[["reluctant","reacio, renuente"],["achieve","lograr, conseguir"],["embarrassed","avergonzado (¡no “embarazada”!)"],["eventually","finalmente, al final (¡no “eventualmente”!)"],["actually","en realidad (¡no “actualmente”!)"],["reliable","confiable, fiable"],["harsh","duro, severo"],["overcome","superar"],["sensible","sensato (¡no “sensible”!)"],["blame","culpar"],["cheerful","alegre, animado"],["though","aunque, sin embargo"]],
+for:["<b>Sing</b> the chorus of your <b>favorite song</b> in English.","Speak with a <b>fake British accent</b> for the next <b>5 minutes</b>.","Tell the class your <b>most embarrassing moment</b> in <b>3 sentences</b>.","<b>Act out</b> a famous movie scene for 15 seconds. The class guesses it.","Be a <b>TV news reporter</b>: <b>aliens</b> have invaded the classroom!","Say <b>“She sells seashells by the seashore”</b> <b>3 times fast</b>.","Speak <b>only in questions</b> for the next <b>2 minutes</b>.","Give a <b>20-second motivational speech</b> to a <b>chair</b> before its big exam."]
+};
+var NAMES={all:"Todas",voc:"Vocabulary",flu:"Fluency",gra:"Grammar",tra:"English → Español"};
+var cur="all",timer=null,lastTr=null,fluSec=60;
+function fmt(s){if(s<=10)return s.toFixed(1);var m=Math.floor(s/60),r=Math.ceil(s%60);if(r===60){m++;r=0}return m+":"+(r<10?"0":"")+r}
+function $(i){return document.getElementById(i)}
+function fill(id,arr,tr){var h="";arr.forEach(function(x){h+=tr?"<li><span><b>"+x[0]+"</b></span><span>"+x[1]+"</span></li>":"<li>"+x+"</li>"});$(id).innerHTML=h}
+fill("L-voc",D.voc);fill("L-flu",D.flu);$("L-gra").innerHTML=D.gra.map(function(g){return"<li>"+g.p+"<small>📘 "+g.t+": "+g.e+"</small></li>"}).join("");fill("L-tra",D.tra,true);fill("L-for",D.for);
+Object.keys(NAMES).forEach(function(k){var b=document.createElement("button");b.className="chip";b.textContent=NAMES[k];b.setAttribute("aria-pressed",k==="all");b.onclick=function(){cur=k;[].forEach.call($("chips").children,function(c){c.setAttribute("aria-pressed",c===b)})};$("chips").appendChild(b)});
+function pick(a){return a[Math.floor(Math.random()*a.length)]}
+[].forEach.call($("flu-opt").querySelectorAll("button"),function(b){b.onclick=function(){fluSec=+b.dataset.s;[].forEach.call($("flu-opt").querySelectorAll("button"),function(c){c.setAttribute("aria-pressed",c===b)})}});
+function stop(){clearInterval(timer);timer=null}
+function start(sec,done){
+ stop();var t0=Date.now(),f=$("fill"),bar=$("bar");bar.className="bar";f.style.transform="scaleX(1)";$("time").textContent=fmt(sec);
+ timer=setInterval(function(){var left=Math.max(0,sec-(Date.now()-t0)/1000);f.style.transform="scaleX("+(left/sec)+")";$("time").textContent=fmt(left);if(left<(sec>10?10:2.5))bar.className="bar low";if(left<=0){stop();if(done)done();else $("time").textContent="TIME’S UP!";}},50);
+}
+$("spin").onclick=function(){
+ var k=cur==="all"?pick(["voc","flu","gra","tra"]):cur;$("ans").textContent="";
+ $("cat").textContent=NAMES[k];$("exp").textContent="";$("phase").textContent="";$("phase").className="phase";
+ if(k==="tra"){lastTr=pick(D.tra);$("prompt").innerHTML="Say it in Spanish: <b>"+lastTr[0]+"</b>";$("reveal").disabled=false}
+ else if(k==="gra"){lastTr=null;var g=pick(D.gra);$("reveal").disabled=true;$("cat").textContent="Grammar · 🧠 Piensa (10 s)";$("phase").className="phase think";$("phase").textContent="⏳ TIEMPO PARA PENSAR · no hables todavía";$("prompt").innerHTML=g.p;$("exp").innerHTML="📘 <b>"+g.t+":</b> "+g.e;start(10,function(){$("cat").textContent="Grammar · 🗣 ¡Habla! (10 s)";$("phase").className="phase talk";$("phase").textContent="🗣 ¡A HABLAR! · ya puedes responder";start(10)});return}
+ else{lastTr=null;$("prompt").innerHTML=pick(D[k]);$("reveal").disabled=true}
+ start(k==="tra"?5:k==="flu"?fluSec:7);
+};
+$("reveal").onclick=function(){if(lastTr)$("ans").textContent="✔ "+lastTr[1]};
+$("dead").onclick=function(){stop();$("exp").textContent="";$("phase").textContent="";$("cat").textContent="☠ You’re dead! Forfeit:";$("prompt").innerHTML=pick(D.for);$("time").textContent="";$("ans").textContent="";$("reveal").disabled=true;$("fill").style.transform="scaleX(0)"};
+</script>
+</body>
+</html>
